@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">GithubUser</string>
+
+    <string name="description">Hello, My name is %s, currently i live in %s and work for %s</string>
+    <string name="username"> \u0040%s </string>
+    <string name="search">Search</string>
+    <string name="search_hint">Search user</string>
+    <string name="tab_follower">Follower</string>
+    <string name="tab_following">Following</string>
+    <string name="setting">Setting</string>
+    <string name="favorite">Favorite</string>
+    <string name="dark_mode">Dark Mode</string>
+</resources>
