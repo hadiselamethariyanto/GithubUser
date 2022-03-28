@@ -1,0 +1,25 @@
+package com.bwx.githubuser.data.source.remote.response
+
+import com.google.gson.annotations.SerializedName
+
+
+data class UserResponse(
+    @field:SerializedName("repos_url")
+    val reposUrl: String,
+    @field:SerializedName("following_url")
+    val followingUrl: String,
+    @field:SerializedName("starred_url")
+    val starredUrl: String,
+    @field:SerializedName("login")
+    val login: String,
+    @field:SerializedName("followers_url")
+    val followersUrl: String,
+    @field:SerializedName("url")
+    val url: String,
+    @field:SerializedName("avatar_url")
+    val avatarUrl: String,
+    @field:SerializedName("id")
+    val id: Int,
+    @field:SerializedName("organizations_url")
+    val organizationsUrl: String
+)

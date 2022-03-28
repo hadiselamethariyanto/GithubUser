@@ -1,103 +1,116 @@
 package com.bwx.githubuser.ui.main
 
-import android.app.SearchManager
-import android.content.Context
-import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuItem
+import android.util.Log
 import android.view.View
-import androidx.appcompat.widget.SearchView
-import androidx.lifecycle.ViewModelProvider
+import android.widget.Toast
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
+import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.bwx.githubuser.R
+import com.bwx.githubuser.data.Resource
 import com.bwx.githubuser.databinding.ActivityMainBinding
-import com.bwx.githubuser.model.UserRespons
-import com.bwx.githubuser.ui.favorite.FavoriteActivity
-import com.bwx.githubuser.ui.setting.SettingActivity
+import com.bwx.githubuser.domain.model.User
+import com.bwx.githubuser.paging.asMergedLoadStates
+import kotlinx.coroutines.flow.*
+import org.koin.android.viewmodel.ext.android.viewModel
 
 class MainActivity : AppCompatActivity() {
-    private lateinit var mainBinding: ActivityMainBinding
-    private lateinit var mainViewModel: MainViewModel
+    private lateinit var binding: ActivityMainBinding
+    private val mainViewModel: MainViewModel by viewModel()
+    private lateinit var mainAdapter: MainAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        installSplashScreen()
+
         super.onCreate(savedInstanceState)
-        mainBinding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(mainBinding.root)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        mainViewModel = ViewModelProvider(
-            this,
-            ViewModelProvider.NewInstanceFactory()
-        ).get(MainViewModel::class.java)
-
-        mainViewModel.listUsers.observe(this, { listUser ->
-            setupListUser(listUser)
-        })
-
-        mainViewModel.isLoading.observe(this, {
-            setLoading(it)
-        })
-
+        setupAdapter()
+        initSwipeToRefresh()
     }
 
-    private fun setLoading(loading: Boolean) {
-        if (loading) {
-            mainBinding.rvUser.visibility = View.GONE
-            mainBinding.refresh.visibility = View.VISIBLE
-        } else {
-            mainBinding.rvUser.visibility = View.VISIBLE
-            mainBinding.refresh.visibility = View.GONE
-        }
-    }
 
-    private fun setupListUser(listUser: List<UserRespons>) {
-
+    private fun setupAdapter() {
         val linearLayoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-        val adapter = MainAdapter(listUser)
-
-        mainBinding.rvUser.setHasFixedSize(true)
-        mainBinding.rvUser.layoutManager = linearLayoutManager
-        mainBinding.rvUser.adapter = adapter
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-
-        val inflater = menuInflater
-        inflater.inflate(R.menu.option_menu, menu)
-
-        val searchManager = getSystemService(Context.SEARCH_SERVICE) as SearchManager
-        val searchView = menu.findItem(R.id.search).actionView as SearchView
-
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(componentName))
-        searchView.queryHint = resources.getString(R.string.search_hint)
-        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String): Boolean {
-                mainViewModel.searchUser(query).observe(this@MainActivity, { response ->
-                    if (response.totalCount > 0) {
-                        setupListUser(response.items)
-                    }
-                })
-                return true
-            }
-
-            override fun onQueryTextChange(newText: String): Boolean {
-                return false
+        mainAdapter = MainAdapter()
+        mainAdapter.setOnItemClickCallback(object : MainAdapter.OnItemClickCallback {
+            override fun onItemClicked(data: User) {
+                mainViewModel.getDetailUser(data.login)
+                    .observe(this@MainActivity, detailUserObserver)
             }
         })
 
-        return true
-    }
+        binding.rvUser.apply {
+            setHasFixedSize(true)
+            layoutManager = linearLayoutManager
+            adapter = mainAdapter.withLoadStateHeaderAndFooter(
+                header = MainLoadStateAdapter(mainAdapter),
+                footer = MainLoadStateAdapter(mainAdapter)
+            )
+        }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.setting -> {
-                startActivity(Intent(this, SettingActivity::class.java))
-            }
-            R.id.favorite -> {
-                startActivity(Intent(this, FavoriteActivity::class.java))
+        lifecycleScope.launchWhenCreated {
+            mainAdapter.loadStateFlow.collectLatest { loadStates ->
+                binding.swipeRefresh.isRefreshing =
+                    loadStates.mediator?.refresh is LoadState.Loading
+
+                if (loadStates.mediator?.refresh is LoadState.NotLoading && loadStates.append.endOfPaginationReached){
+                    binding.rvUser.visibility = View.GONE
+                    binding.emptyView.visibility = View.VISIBLE
+                }else{
+                    binding.emptyView.visibility = View.GONE
+                    binding.rvUser.visibility = View.VISIBLE
+                }
             }
         }
-        return super.onOptionsItemSelected(item)
+
+        lifecycleScope.launchWhenCreated {
+            mainViewModel.users.collectLatest {
+                mainAdapter.submitData(it)
+            }
+        }
+
+        lifecycleScope.launchWhenCreated {
+            mainAdapter.loadStateFlow
+                .asMergedLoadStates()
+                .distinctUntilChangedBy { it.refresh }
+                .filter { it.refresh is LoadState.NotLoading }
+                .collect {
+                    binding.rvUser.scrollToPosition(0)
+             }
+        }
     }
+
+    private fun initSwipeToRefresh() {
+        binding.swipeRefresh.setOnRefreshListener {
+            mainAdapter.refresh()
+        }
+    }
+
+    private val detailUserObserver = Observer<Resource<User>> { data ->
+        if (data != null) {
+            when (data) {
+                is Resource.Loading -> {
+                    binding.swipeRefresh.isRefreshing = true
+                }
+                is Resource.Success -> {
+                    binding.swipeRefresh.isRefreshing = false
+                    Toast.makeText(
+                        this,
+                        "name:${data.data?.name} \n email:${data.data?.email} \n created_at:${data.data?.created_at}",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+                is Resource.Error -> {
+                    binding.swipeRefresh.isRefreshing = false
+                    Toast.makeText(this, data.message, Toast.LENGTH_LONG).show()
+                }
+            }
+        }
+    }
+
 }
