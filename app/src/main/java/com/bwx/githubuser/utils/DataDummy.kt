@@ -18,6 +18,41 @@ object DataDummy {
         )
     }
 
+    fun generateUsersEntityDummy(): List<UserEntity> {
+        val users = ArrayList<UserEntity>()
+        users.add(
+            UserEntity(
+                id = 1,
+                login = "hadi",
+                repos_url = "",
+                avatar_url = "",
+                company = "",
+                location = "Banyuwangi",
+                name = "hadi",
+                email = "muhammad.hadi.selamet@gmail.com",
+                created_at = "",
+                isFav = false
+            )
+        )
+
+        users.add(
+            UserEntity(
+                id = 2,
+                login = "selamet",
+                repos_url = "",
+                avatar_url = "",
+                company = "",
+                location = "Banyuwangi",
+                name = "selamet",
+                email = "selamet@gmail.com",
+                created_at = "",
+                isFav = false
+            )
+        )
+
+        return users
+    }
+
     fun generateUserEntityDummy(): UserEntity {
         return UserEntity(
             id = 1,
