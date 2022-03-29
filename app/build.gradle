@@ -25,14 +25,14 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
 
-        debug{
+        debug {
             minifyEnabled false
             buildConfigField "String", "BASE_URL", "\"https://api.github.com/\""
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
 
-    buildFeatures{
+    buildFeatures {
         viewBinding true
     }
     compileOptions {
@@ -98,7 +98,8 @@ dependencies {
     testImplementation "org.mockito:mockito-inline:$mockitoVersion"
     testImplementation "androidx.arch.core:core-testing:$androidCoreTestVersion"
     testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:$mockitoKotlinVersion"
-    testImplementation  "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.3.9"
+    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.3.9"
     testImplementation 'app.cash.turbine:turbine:0.7.0'
     testImplementation 'com.android.support.test:runner:1.0.2'
+    testImplementation "com.squareup.okhttp3:mockwebserver:4.6.0"
 }
