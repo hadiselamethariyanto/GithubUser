@@ -2,7 +2,6 @@ package com.bwx.githubuser.ui.main
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -58,18 +57,19 @@ class MainActivity : AppCompatActivity() {
                 binding.swipeRefresh.isRefreshing =
                     loadStates.mediator?.refresh is LoadState.Loading
 
-                if (loadStates.mediator?.refresh is LoadState.NotLoading && loadStates.append.endOfPaginationReached){
+                if (loadStates.mediator?.refresh is LoadState.NotLoading && loadStates.append.endOfPaginationReached) {
                     binding.rvUser.visibility = View.GONE
                     binding.emptyView.visibility = View.VISIBLE
-                }else{
+                } else {
                     binding.emptyView.visibility = View.GONE
                     binding.rvUser.visibility = View.VISIBLE
                 }
             }
         }
 
-        lifecycleScope.launchWhenCreated {
-            mainViewModel.users.collectLatest {
+
+        mainViewModel.getUsers().observe(this@MainActivity) {
+            lifecycleScope.launchWhenCreated {
                 mainAdapter.submitData(it)
             }
         }
@@ -81,7 +81,7 @@ class MainActivity : AppCompatActivity() {
                 .filter { it.refresh is LoadState.NotLoading }
                 .collect {
                     binding.rvUser.scrollToPosition(0)
-             }
+                }
         }
     }
 
@@ -90,6 +90,7 @@ class MainActivity : AppCompatActivity() {
             mainAdapter.refresh()
         }
     }
+
 
     private val detailUserObserver = Observer<Resource<User>> { data ->
         if (data != null) {

@@ -7,11 +7,10 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bwx.githubuser.R
-import com.bwx.githubuser.data.source.local.entity.UserEntity
 import com.bwx.githubuser.databinding.ItemUserBinding
 import com.bwx.githubuser.domain.model.User
 
-class MainAdapter : PagingDataAdapter<UserEntity, MainAdapter.ViewHolder>(DataDifferntiator) {
+class MainAdapter : PagingDataAdapter<User, MainAdapter.ViewHolder>(DataDifferntiator) {
 
     private lateinit var onItemClickCallback: OnItemClickCallback
 
@@ -37,16 +36,7 @@ class MainAdapter : PagingDataAdapter<UserEntity, MainAdapter.ViewHolder>(DataDi
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = getItem(position)
         if (item != null) {
-            val user = User(
-                id = item.id,
-                avatar_url = item.avatar_url,
-                login = item.login,
-                repos_url = item.repos_url,
-                name = item.name,
-                email = item.email,
-                created_at = item.created_at
-            )
-            holder.bindItem(user, onItemClickCallback)
+            holder.bindItem(item, onItemClickCallback)
         }
     }
 
@@ -56,13 +46,13 @@ class MainAdapter : PagingDataAdapter<UserEntity, MainAdapter.ViewHolder>(DataDi
 
     }
 
-    object DataDifferntiator : DiffUtil.ItemCallback<UserEntity>() {
+    object DataDifferntiator : DiffUtil.ItemCallback<User>() {
 
-        override fun areItemsTheSame(oldItem: UserEntity, newItem: UserEntity): Boolean {
+        override fun areItemsTheSame(oldItem: User, newItem: User): Boolean {
             return oldItem.id == newItem.id
         }
 
-        override fun areContentsTheSame(oldItem: UserEntity, newItem: UserEntity): Boolean {
+        override fun areContentsTheSame(oldItem: User, newItem: User): Boolean {
             return oldItem == newItem
         }
     }

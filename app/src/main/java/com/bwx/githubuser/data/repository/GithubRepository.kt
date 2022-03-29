@@ -3,6 +3,7 @@ package com.bwx.githubuser.data.repository
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
+import androidx.paging.map
 import com.bwx.githubuser.data.Resource
 import com.bwx.githubuser.data.source.local.LocalDataSource
 import com.bwx.githubuser.data.source.local.entity.UserEntity
@@ -29,7 +30,11 @@ class GithubRepository(
         )
     ) {
         localDataSource.getPagingUsers()
-    }.flow
+    }.flow.map { pagingData ->
+        pagingData.map { userEntity ->
+            DataMapper.mapUserEntityToDomain(userEntity)
+        }
+    }
 
     override fun getDetailUser(login: String): Flow<Resource<User>> {
         return object : NetworkBoundResource<User, DetailUserResponse>() {
