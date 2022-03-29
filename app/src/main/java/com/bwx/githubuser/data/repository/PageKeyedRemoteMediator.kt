@@ -35,12 +35,10 @@ class PageKeyedRemoteMediator(
                 }
 
             }
-
             val items = remoteDataSource.getPagingUsers(per_page = 10, since = loadKey)
 
             val userEntities = DataMapper.mapUsersResponseToEntities(items)
             localDataSource.insertUsers(userEntities)
-
             return MediatorResult.Success(endOfPaginationReached = items.isEmpty())
 
         } catch (e: IOException) {

@@ -1,4 +1,4 @@
-package com.bwx.githubuser.source.data.local
+package com.bwx.githubuser.data.source.local
 
 import android.content.Context
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
