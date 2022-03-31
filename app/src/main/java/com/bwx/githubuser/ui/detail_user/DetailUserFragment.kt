@@ -11,6 +11,7 @@ import androidx.lifecycle.Observer
 import com.bumptech.glide.Glide
 import com.bwx.githubuser.R
 import com.bwx.githubuser.data.Resource
+import com.bwx.githubuser.databinding.ContentDetailUserBinding
 import com.bwx.githubuser.databinding.FragmentDetailUserBinding
 import com.bwx.githubuser.domain.model.User
 import com.google.android.material.tabs.TabLayoutMediator
@@ -20,6 +21,7 @@ class DetailUserFragment : Fragment() {
 
     private var _binding: FragmentDetailUserBinding? = null
     private val binding get() = _binding!!
+    private lateinit var contentDetailBinding: ContentDetailUserBinding
     private val viewModel: DetailUserViewModel by viewModel()
 
     override fun onCreateView(
@@ -28,6 +30,7 @@ class DetailUserFragment : Fragment() {
     ): View {
         // Inflate the layout for this fragment
         _binding = FragmentDetailUserBinding.inflate(layoutInflater, container, false)
+        contentDetailBinding = binding.detailContent
         val login = arguments?.getString(USER_KEY) ?: ""
         setupTabs(login)
         setUserProfile(login)
@@ -36,10 +39,10 @@ class DetailUserFragment : Fragment() {
 
     private fun setupTabs(login: String) {
         val sectionsPagerAdapter = SectionsPagerAdapter(requireActivity(), login)
-        binding.viewPager.adapter = sectionsPagerAdapter
+        contentDetailBinding.viewPager.adapter = sectionsPagerAdapter
         TabLayoutMediator(
-            binding.tabs,
-            binding.viewPager
+            contentDetailBinding.tabs,
+            contentDetailBinding.viewPager
         ) { tab, position ->
             tab.icon = ContextCompat.getDrawable(requireActivity(), TAB_ICONS[position])
         }.attach()
@@ -53,11 +56,12 @@ class DetailUserFragment : Fragment() {
         if (data != null) {
             when (data) {
                 is Resource.Loading -> {
-
+                    binding.loading.viewLoading.visibility = View.VISIBLE
+                    binding.fabAdd.visibility = View.GONE
                 }
                 is Resource.Success -> {
                     val user = data.data
-                    with(binding) {
+                    with(contentDetailBinding) {
                         tvName.text = user?.name
                         tvLogin.text = resources.getString(R.string.user_id, user?.login)
                         tvCompany.text = user?.company
@@ -71,12 +75,17 @@ class DetailUserFragment : Fragment() {
 
                     }
 
+                    binding.loading.viewLoading.visibility = View.GONE
+                    binding.fabAdd.visibility = View.VISIBLE
+
                     Glide.with(requireActivity()).load(user?.avatar_url)
                         .placeholder(R.drawable.ic_user)
-                        .circleCrop().into(binding.imgUser)
+                        .circleCrop().into(contentDetailBinding.imgUser)
                 }
                 is Resource.Error -> {
-                    Toast.makeText(requireActivity(), data.message, Toast.LENGTH_LONG).show()
+                    binding.loading.viewLoading.visibility = View.GONE
+                    binding.error.viewError.visibility = View.VISIBLE
+                    binding.error.tvError.text = data.message
                 }
             }
         }
