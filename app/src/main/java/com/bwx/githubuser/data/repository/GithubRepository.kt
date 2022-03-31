@@ -10,6 +10,8 @@ import com.bwx.githubuser.data.source.local.entity.UserEntity
 import com.bwx.githubuser.data.source.remote.RemoteDataSource
 import com.bwx.githubuser.data.source.remote.network.ApiResponse
 import com.bwx.githubuser.data.source.remote.response.DetailUserResponse
+import com.bwx.githubuser.data.source.remote.response.RepositoryResponse
+import com.bwx.githubuser.domain.model.Repository
 import com.bwx.githubuser.domain.model.User
 import com.bwx.githubuser.domain.repository.IGithubRepository
 import com.bwx.githubuser.utils.DataMapper
@@ -60,9 +62,38 @@ class GithubRepository(
                     name = data.name.toString(),
                     email = data.email.toString(),
                     created_at = data.created_at.toString(),
-                    false
+                    public_repos = data.public_repos,
+                    following = data.following,
+                    followers = data.followers,
+                    isFav = false
                 )
                 localDataSource.updateUser(user)
+            }
+        }.asFlow()
+    }
+
+    override fun getUserRepository(login: String): Flow<Resource<List<Repository>>> {
+        return object : NetworkBoundResource<List<Repository>, List<RepositoryResponse>>() {
+            override fun loadFromDB(): Flow<List<Repository>> {
+                return localDataSource.getRepository(login).map {
+                    DataMapper.mapRepositoryEntitiesToDomain(it)
+                }
+            }
+
+            override fun shouldFetch(data: List<Repository>?): Boolean =
+                data == null || data.isEmpty()
+
+            override suspend fun createCall(): Flow<ApiResponse<List<RepositoryResponse>>> =
+                remoteDataSource.getUserRepository(login)
+
+            override suspend fun saveCallResult(data: List<RepositoryResponse>) {
+                if (data.isNotEmpty()) {
+                    localDataSource.insertRepositories(
+                        DataMapper.mapRepositoryResponseToEntities(
+                            data, login
+                        )
+                    )
+                }
             }
         }.asFlow()
     }

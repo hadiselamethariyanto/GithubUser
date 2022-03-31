@@ -5,7 +5,6 @@ import com.bwx.githubuser.domain.model.User
 
 object DataDummy {
 
-
     fun generateUserDummy(): User {
         return User(
             id = 1,
@@ -14,7 +13,12 @@ object DataDummy {
             avatar_url = "",
             name = "hadi",
             email = "muhammad.hadi.selamet@gmail.com",
-            created_at = ""
+            created_at = "",
+            company = "",
+            location = "",
+            public_repos = 0,
+            following = 0,
+            followers = 0
         )
     }
 
@@ -31,6 +35,9 @@ object DataDummy {
                 name = "hadi",
                 email = "muhammad.hadi.selamet@gmail.com",
                 created_at = "",
+                public_repos = 0,
+                following = 0,
+                followers = 0,
                 isFav = false
             )
         )
@@ -46,6 +53,9 @@ object DataDummy {
                 name = "selamet",
                 email = "selamet@gmail.com",
                 created_at = "",
+                public_repos = 0,
+                following = 0,
+                followers = 0,
                 isFav = false
             )
         )
@@ -64,6 +74,9 @@ object DataDummy {
             name = "hadi",
             email = "muhammad.hadi.selamet@gmail.com",
             created_at = "",
+            public_repos = 0,
+            following = 0,
+            followers = 0,
             isFav = false
         )
     }

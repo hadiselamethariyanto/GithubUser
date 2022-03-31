@@ -19,6 +19,12 @@ data class DetailUserResponse(
     val location: String? = null,
     @field:SerializedName("email")
     val email: String? = null,
+    @field:SerializedName("public_repos")
+    var public_repos: Int,
+    @field:SerializedName("following")
+    var following: Int,
+    @field:SerializedName("followers")
+    var followers: Int,
     @field:SerializedName("created_at")
     val created_at: String? = null
 )

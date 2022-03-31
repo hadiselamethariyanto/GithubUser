@@ -25,6 +25,12 @@ data class UserEntity(
     var email: String,
     @ColumnInfo(name = "created_at")
     var created_at: String,
+    @ColumnInfo(name = "public_repos")
+    var public_repos: Int,
+    @ColumnInfo(name = "following")
+    var following: Int,
+    @ColumnInfo(name = "followers")
+    var followers: Int,
     @ColumnInfo(name = "isFav")
     var isFav: Boolean
 )

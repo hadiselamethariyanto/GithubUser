@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/repository"
+    app:startDestination="@id/repositoryScreen">
+
+    <fragment
+        android:id="@+id/repositoryScreen"
+        android:name="com.bwx.githubuser.ui.repository.RepositoryFragment"
+        android:label="@string/title_repository"
+        tools:layout="@layout/fragment_repository" />
+</navigation>

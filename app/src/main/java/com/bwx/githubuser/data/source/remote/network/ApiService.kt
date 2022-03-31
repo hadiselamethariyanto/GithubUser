@@ -14,4 +14,7 @@ interface ApiService {
     @GET("users/{login}")
     suspend fun getDetailUsers(@Path("login") login: String): DetailUserResponse
 
+    @GET("users/{login}/repos")
+    suspend fun getUserRepository(@Path("login") login: String): List<RepositoryResponse>
+
 }
