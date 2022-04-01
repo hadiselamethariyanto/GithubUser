@@ -5,15 +5,12 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.core.os.bundleOf
-import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bwx.githubuser.R
-import com.bwx.githubuser.data.Resource
 import com.bwx.githubuser.databinding.FragmentHomeBinding
 import com.bwx.githubuser.domain.model.User
 import com.bwx.githubuser.paging.asMergedLoadStates
@@ -48,8 +45,6 @@ class HomeFragment : Fragment() {
         mainAdapter = MainAdapter()
         mainAdapter.setOnItemClickCallback(object : MainAdapter.OnItemClickCallback {
             override fun onItemClicked(data: User) {
-//                mainViewModel.getDetailUser(data.login)
-//                    .observe(viewLifecycleOwner, detailUserObserver)
                 val bundle = bundleOf(USER_KEY to data.login)
                 findNavController().navigate(R.id.action_home_to_detail_user, bundle)
             }
@@ -102,8 +97,6 @@ class HomeFragment : Fragment() {
             mainAdapter.refresh()
         }
     }
-
-
 
 
 }

@@ -2,6 +2,7 @@ package com.bwx.githubuser.domain.usecase
 
 import androidx.paging.PagingData
 import com.bwx.githubuser.data.Resource
+import com.bwx.githubuser.domain.model.Following
 import com.bwx.githubuser.domain.model.Repository
 import com.bwx.githubuser.domain.model.User
 import com.bwx.githubuser.domain.repository.IGithubRepository
@@ -14,4 +15,7 @@ class GithubInteractor(private val repository: IGithubRepository) : GithubUseCas
 
     override fun getUserRepository(login: String): Flow<Resource<List<Repository>>> =
         repository.getUserRepository(login)
+
+    override fun getUserFollowing(login: String): Flow<Resource<List<Following>>> =
+        repository.getUserFollowing(login)
 }

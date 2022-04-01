@@ -2,6 +2,7 @@ package com.bwx.githubuser.data.source.local.room
 
 import androidx.paging.PagingSource
 import androidx.room.*
+import com.bwx.githubuser.data.source.local.entity.FollowingEntity
 import com.bwx.githubuser.data.source.local.entity.RepositoryEntity
 import com.bwx.githubuser.data.source.local.entity.UserEntity
 import kotlinx.coroutines.flow.Flow
@@ -14,6 +15,9 @@ interface GithubDao {
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertRepositories(repositories: List<RepositoryEntity>)
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertFollowing(following: List<FollowingEntity>)
 
     @Update
     suspend fun updateUser(user: UserEntity)
@@ -29,5 +33,8 @@ interface GithubDao {
 
     @Query("SELECT * FROM repository WHERE login=:login")
     fun getRepository(login: String): Flow<List<RepositoryEntity>>
+
+    @Query("SELECT * FROM following WHERE login_following=:login")
+    fun getUserFollowing(login: String): Flow<List<FollowingEntity>>
 
 }

@@ -10,7 +10,9 @@ import com.bwx.githubuser.data.source.local.entity.UserEntity
 import com.bwx.githubuser.data.source.remote.RemoteDataSource
 import com.bwx.githubuser.data.source.remote.network.ApiResponse
 import com.bwx.githubuser.data.source.remote.response.DetailUserResponse
+import com.bwx.githubuser.data.source.remote.response.FollowingResponse
 import com.bwx.githubuser.data.source.remote.response.RepositoryResponse
+import com.bwx.githubuser.domain.model.Following
 import com.bwx.githubuser.domain.model.Repository
 import com.bwx.githubuser.domain.model.User
 import com.bwx.githubuser.domain.repository.IGithubRepository
@@ -95,6 +97,34 @@ class GithubRepository(
                     )
                 }
             }
+        }.asFlow()
+    }
+
+    override fun getUserFollowing(login: String): Flow<Resource<List<Following>>> {
+        return object : NetworkBoundResource<List<Following>, List<FollowingResponse>>() {
+            override fun loadFromDB(): Flow<List<Following>> =
+                localDataSource.getUserFollowing(login).map {
+                    DataMapper.mapFollowingEntitiesToDomain(it)
+                }
+
+
+            override fun shouldFetch(data: List<Following>?): Boolean =
+                data == null || data.isEmpty()
+
+            override suspend fun createCall(): Flow<ApiResponse<List<FollowingResponse>>> =
+                remoteDataSource.getUserFollowing(login)
+
+            override suspend fun saveCallResult(data: List<FollowingResponse>) {
+                if (data.isNotEmpty()) {
+                    localDataSource.insertFollowing(
+                        DataMapper.mapFollowingResponseToEntities(
+                            data,
+                            login
+                        )
+                    )
+                }
+            }
+
         }.asFlow()
     }
 
