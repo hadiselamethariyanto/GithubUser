@@ -10,8 +10,10 @@ import com.bwx.githubuser.data.source.local.entity.UserEntity
 import com.bwx.githubuser.data.source.remote.RemoteDataSource
 import com.bwx.githubuser.data.source.remote.network.ApiResponse
 import com.bwx.githubuser.data.source.remote.response.DetailUserResponse
+import com.bwx.githubuser.data.source.remote.response.FollowersResponse
 import com.bwx.githubuser.data.source.remote.response.FollowingResponse
 import com.bwx.githubuser.data.source.remote.response.RepositoryResponse
+import com.bwx.githubuser.domain.model.Followers
 import com.bwx.githubuser.domain.model.Following
 import com.bwx.githubuser.domain.model.Repository
 import com.bwx.githubuser.domain.model.User
@@ -118,6 +120,34 @@ class GithubRepository(
                 if (data.isNotEmpty()) {
                     localDataSource.insertFollowing(
                         DataMapper.mapFollowingResponseToEntities(
+                            data,
+                            login
+                        )
+                    )
+                }
+            }
+
+        }.asFlow()
+    }
+
+    override fun getUserFollowers(login: String): Flow<Resource<List<Followers>>> {
+        return object : NetworkBoundResource<List<Followers>, List<FollowersResponse>>() {
+            override fun loadFromDB(): Flow<List<Followers>> {
+                return localDataSource.getUserFollowers(login).map {
+                    DataMapper.mapFollowerEntitiesToDomain(it)
+                }
+            }
+
+            override fun shouldFetch(data: List<Followers>?): Boolean =
+                data == null || data.isEmpty()
+
+            override suspend fun createCall(): Flow<ApiResponse<List<FollowersResponse>>> =
+                remoteDataSource.getUserFollowers(login)
+
+            override suspend fun saveCallResult(data: List<FollowersResponse>) {
+                if (data.isNotEmpty()) {
+                    localDataSource.insertFollowers(
+                        DataMapper.mapFollowersResponseToEntities(
                             data,
                             login
                         )

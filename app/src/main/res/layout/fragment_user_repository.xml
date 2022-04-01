@@ -9,7 +9,5 @@
         android:id="@+id/rvRepositories"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:clipToPadding="true"
-        android:nestedScrollingEnabled="false"
         tools:listitem="@layout/item_repository" />
 </androidx.constraintlayout.widget.ConstraintLayout>

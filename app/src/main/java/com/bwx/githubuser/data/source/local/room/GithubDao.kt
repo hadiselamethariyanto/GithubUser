@@ -2,6 +2,7 @@ package com.bwx.githubuser.data.source.local.room
 
 import androidx.paging.PagingSource
 import androidx.room.*
+import com.bwx.githubuser.data.source.local.entity.FollowersEntity
 import com.bwx.githubuser.data.source.local.entity.FollowingEntity
 import com.bwx.githubuser.data.source.local.entity.RepositoryEntity
 import com.bwx.githubuser.data.source.local.entity.UserEntity
@@ -18,6 +19,9 @@ interface GithubDao {
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertFollowing(following: List<FollowingEntity>)
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertFollowers(followers: List<FollowersEntity>)
 
     @Update
     suspend fun updateUser(user: UserEntity)
@@ -36,5 +40,8 @@ interface GithubDao {
 
     @Query("SELECT * FROM following WHERE login_following=:login")
     fun getUserFollowing(login: String): Flow<List<FollowingEntity>>
+
+    @Query("SELECT * FROM followers WHERE login_followers=:login")
+    fun getUserFollowers(login: String): Flow<List<FollowersEntity>>
 
 }

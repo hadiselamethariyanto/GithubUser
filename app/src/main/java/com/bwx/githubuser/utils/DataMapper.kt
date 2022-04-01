@@ -1,11 +1,14 @@
 package com.bwx.githubuser.utils
 
+import com.bwx.githubuser.data.source.local.entity.FollowersEntity
 import com.bwx.githubuser.data.source.local.entity.FollowingEntity
 import com.bwx.githubuser.data.source.local.entity.RepositoryEntity
 import com.bwx.githubuser.data.source.local.entity.UserEntity
+import com.bwx.githubuser.data.source.remote.response.FollowersResponse
 import com.bwx.githubuser.data.source.remote.response.FollowingResponse
 import com.bwx.githubuser.data.source.remote.response.RepositoryResponse
 import com.bwx.githubuser.data.source.remote.response.UserResponse
+import com.bwx.githubuser.domain.model.Followers
 import com.bwx.githubuser.domain.model.Following
 import com.bwx.githubuser.domain.model.Repository
 import com.bwx.githubuser.domain.model.User
@@ -49,6 +52,32 @@ object DataMapper {
             users.add(user)
         }
         return users
+    }
+
+    fun mapFollowerEntitiesToDomain(input: List<FollowersEntity>): List<Followers> {
+        return input.map {
+            Followers(
+                id = it.id,
+                login = it.login,
+                avatar_url = it.avatar_url,
+                repos_url = it.repos_url
+            )
+        }
+    }
+
+    fun mapFollowersResponseToEntities(
+        input: List<FollowersResponse>,
+        login: String
+    ): List<FollowersEntity> {
+        return input.map {
+            FollowersEntity(
+                id = it.id ?: 0,
+                login = it.login.toString(),
+                avatar_url = it.avatar_url.toString(),
+                repos_url = it.repos_url.toString(),
+                login_followers = login
+            )
+        }
     }
 
     fun mapFollowingEntitiesToDomain(input: List<FollowingEntity>): List<Following> {

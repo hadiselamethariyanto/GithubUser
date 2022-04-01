@@ -20,4 +20,7 @@ interface ApiService {
     @GET("users/{login}/following")
     suspend fun getUserFollowing(@Path("login") login: String): List<FollowingResponse>
 
+    @GET("users/{login}/followers")
+    suspend fun getUserFollowers(@Path("login") login: String): List<FollowersResponse>
+
 }

@@ -18,7 +18,7 @@ class SectionsPagerAdapter(activity: FragmentActivity, val login: String) :
         when (position) {
             0 -> fragment = UserRepositoryFragment.newInstance(login)
             1 -> fragment = FollowingFragment.newInstance(login)
-            2 -> fragment = FollowersFragment()
+            2 -> fragment = FollowersFragment.newInstance(login)
         }
         return fragment as Fragment
     }
